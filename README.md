@@ -1,4 +1,4 @@
 hesitation_study
 ================
 
-Containing the code and simulator envrionment for the hasitation study.
+Containing the code and simulator environment for the hesitation study.
