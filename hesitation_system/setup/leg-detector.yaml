@@ -1,7 +1,7 @@
  - svn:
-		local-name: people_detector_2d_laser
-		uri: https://svn.code.sf.net/p/tum-ros-pkg/code/3rdparty/people_detector_2d_laser/
+     local-name: people_detector_2d_laser
+     uri: https://svn.code.sf.net/p/tum-ros-pkg/code/3rdparty/people_detector_2d_laser/
 
  - svn:
-		local-name: people_detector_node
-		uri: https://svn.code.sf.net/p/tum-ros-pkg/code/perception/people_detector_node/
+     local-name: people_detector_node
+     uri: https://svn.code.sf.net/p/tum-ros-pkg/code/perception/people_detector_node/
