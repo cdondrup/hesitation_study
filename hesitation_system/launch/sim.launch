@@ -1,0 +1,5 @@
+<launch>
+	<include file="$(find strands_morse)/uol/launch/uol_study_restaurant_morse.launch"/>
+	<include file="$(find strands_morse)/uol/launch/uol_study_restaurant_nav2d.launch"/>
+	<include file="$(find people_detector_node)/launch/people_detector.launch"/>
+</launch>
