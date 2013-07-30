@@ -2,12 +2,15 @@
 #define LEG_DETECTOR_TRANSFORM_H
 
 // ROS includes.
-#include "ros/ros.h"
-#include "ros/time.h"
-#include "sensor_msgs/LaserScan.h"
+#include <ros/ros.h>
+#include <ros/time.h>
+#include <sensor_msgs/LaserScan.h>
+#include <geometry_msgs/PointStamped.h>
+#include <tf/transform_listener.h>
 
 #include <string.h>
 #include <vector>
+#include <math.h>
 
 #include "leg_detector_tf_msgs/Distance.h"
 
@@ -26,6 +29,11 @@ class LegDetectorTf
 private:
 	leg_detector_tf_msgs::Distance distance;
 	ros::Publisher *pub;
+	tf::TransformListener listener;
+	
+	geometry_msgs::PointStamped polarToCartesian(float dist, float angle);
+	geometry_msgs::PointStamped transformLaserToBase(geometry_msgs::PointStamped);
+	
 public:
   //! Constructor.
   LegDetectorTf(ros::Publisher *pub);
