@@ -72,7 +72,8 @@ void LegDetectorTf::createVisualisation(std::vector<geometry_msgs::PointStamped>
 
 void LegDetectorTf::messageCallback(const sensor_msgs::LaserScan::ConstPtr &msg)
 {
-    std::vector<geometry_msgs::PointStamped> leg_points;
+    std::vector<std::vector<geometry_msgs::PointStamped> > leg_point_bins;
+    std::vector<geometry_msgs::PointStamped>* leg_points = new std::vector<geometry_msgs::PointStamped>();
 	++distance.header.seq;
 	distance.max = 0.0;
 	distance.min = 1000.0;
@@ -88,26 +89,31 @@ void LegDetectorTf::messageCallback(const sensor_msgs::LaserScan::ConstPtr &msg)
 		        angle);
 		    geometry_msgs::PointStamped coords = polarToCartesian(msg->ranges[i], angle);
 		    transformLaser(coords, "/base_link");
-		    leg_points.push_back(transformLaser(coords, "/map"));
+		    leg_points->push_back(transformLaser(coords, "/map"));
 			legs.push_back(msg->ranges[i]);
 			ROS_DEBUG("LegDetectorTf::messageCallback: Range: %f", msg->ranges[i]);
 			distance.max = msg->ranges[i] > distance.max ? msg->ranges[i] : distance.max;
 			distance.min = msg->ranges[i] < distance.min ? msg->ranges[i] : distance.min;
 			distance.avg += msg->ranges[i];
+		} else if(leg_points->size() > 0) {
+		    ROS_DEBUG("LegDetectorTf::messageCallback: Found new human with %i leg points", (int)leg_points->size());
+		    leg_point_bins.push_back(*leg_points);
+		    leg_points = new std::vector<geometry_msgs::PointStamped>();
 		}
 	}
 	distance.avg /= legs.size();
+	ROS_DEBUG("LegDetectorTf::messageCallback: Found %i humans", (int)leg_point_bins.size());
 	ROS_DEBUG("LegDetectorTf::messageCallback: Range: Min: %f, Max: %f, Avg: %f", distance.min, distance.max, distance.avg);
 	distance.header.stamp = ros::Time::now();
 	publishMessage(distance);
-	createVisualisation(leg_points);
+	createVisualisation(getCenterPoints(leg_point_bins));
 } // end publishCallback()
 
 geometry_msgs::PointStamped LegDetectorTf::polarToCartesian(float dist, float angle) {
     ROS_DEBUG("LegDetectorTf::polarToCartesian: Received: distance: %f, angle: %f", dist, angle);
     geometry_msgs::PointStamped output;
     output.header.frame_id = "/base_laser_link";
-    output.header.stamp = ros::Time();
+    output.header.stamp = ros::Time::now();
     output.point.x = dist * cos(angle);
     output.point.y = dist * sin(angle);
     output.point.z = 0.0;
@@ -131,6 +137,25 @@ geometry_msgs::PointStamped LegDetectorTf::transformLaser(geometry_msgs::PointSt
             ex.what());
     }
     return output;
+}
+
+std::vector<geometry_msgs::PointStamped> LegDetectorTf::getCenterPoints(std::vector<std::vector<geometry_msgs::PointStamped> > input) {
+    std::vector<geometry_msgs::PointStamped> centers;
+    for(int i = 0; i < input.size(); i++) {
+        geometry_msgs::PointStamped center;
+        center.header.frame_id = "/map";
+        center.header.stamp = ros::Time::now();
+        float x = 0, y = 0;
+        for(int j = 0; j < input[i].size(); j++) {
+            x += input[i][j].point.x;
+            y += input[i][j].point.y;
+        }
+        center.point.x = x / input[i].size();
+        center.point.y = y / input[i].size();
+        center.point.z = 0.0;
+        centers.push_back(center);
+    }
+    return centers;
 }
 
 /*--------------------------------------------------------------------

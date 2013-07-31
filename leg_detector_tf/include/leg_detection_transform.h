@@ -41,6 +41,7 @@ private:
     //! Publish the message.
     void publishMessage(leg_detector_tf_msgs::Distance distance);
     void publishVisualisation(visualization_msgs::MarkerArray marker_array);
+    std::vector<geometry_msgs::PointStamped> getCenterPoints(std::vector<std::vector<geometry_msgs::PointStamped> >);
 	
 public:
   //! Constructor.
