@@ -32,7 +32,7 @@ private:
 	tf::TransformListener listener;
 	
 	geometry_msgs::PointStamped polarToCartesian(float dist, float angle);
-	geometry_msgs::PointStamped transformLaserToBase(geometry_msgs::PointStamped);
+	geometry_msgs::PointStamped transformLaser(geometry_msgs::PointStamped, std::string);
 	
 public:
   //! Constructor.
