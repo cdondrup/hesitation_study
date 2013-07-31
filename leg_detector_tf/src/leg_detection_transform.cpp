@@ -156,6 +156,7 @@ geometry_msgs::PointStamped LegDetectorTf::transformLaser(geometry_msgs::PointSt
     ROS_DEBUG("LegDetectorTf::transformLaser: Transforming %s to %s", input.header.frame_id.c_str(), target.c_str());
     geometry_msgs::PointStamped output;
     try {
+        listener.waitForTransform(input.header.frame_id, target, ros::Time(), ros::Duration(3.0));
         listener.transformPoint(target, input, output);
 
         ROS_DEBUG("LegDetectorTf::transformLaser: %s: (%.2f, %.2f. %.2f) ---> %s: (%.2f, %.2f, %.2f) at time %.2f",
