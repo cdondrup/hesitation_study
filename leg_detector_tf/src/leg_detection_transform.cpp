@@ -79,8 +79,10 @@ void LegDetectorTf::messageCallback(const sensor_msgs::LaserScan::ConstPtr &msg)
 	distance.min = 1000.0;
 	distance.avg = 0.0;
 	std::vector<float> legs;
+	int leg_distance = 0;
 	for(int i = 0; i < msg->intensities.size(); i++) {
 		if(msg->intensities[i] == 1.0) {
+		    leg_distance = 0;
 		    float angle = msg->angle_min + ((i+1) * msg->angle_increment);
 		    ROS_DEBUG("LegDetectorTf::messageCallback: Angel calculation: a_min:%f + ((i:%i+1) * a_inc:%f) = %f", 
 		        msg->angle_min, 
@@ -96,10 +98,15 @@ void LegDetectorTf::messageCallback(const sensor_msgs::LaserScan::ConstPtr &msg)
 			distance.min = msg->ranges[i] < distance.min ? msg->ranges[i] : distance.min;
 			distance.avg += msg->ranges[i];
 		} else if(leg_points->size() > 0) {
-		    ROS_DEBUG("LegDetectorTf::messageCallback: Found new human with %i leg points", (int)leg_points->size());
-		    leg_point_bins.push_back(*leg_points);
-		    leg_points = new std::vector<geometry_msgs::PointStamped>();
-		}
+		    if(leg_distance >= MAX_LEG_DISTANCE || i-1 == msg->intensities.size()) {
+		        ROS_DEBUG("LegDetectorTf::messageCallback: Found new human with %i leg points", (int)leg_points->size());
+		        leg_point_bins.push_back(*leg_points);
+		        leg_points = new std::vector<geometry_msgs::PointStamped>();
+		        leg_distance = 0;
+	        } else {
+	            leg_distance++;
+            }
+		} 
 	}
 	distance.avg /= legs.size();
 	ROS_DEBUG("LegDetectorTf::messageCallback: Found %i humans", (int)leg_point_bins.size());
@@ -113,7 +120,7 @@ geometry_msgs::PointStamped LegDetectorTf::polarToCartesian(float dist, float an
     ROS_DEBUG("LegDetectorTf::polarToCartesian: Received: distance: %f, angle: %f", dist, angle);
     geometry_msgs::PointStamped output;
     output.header.frame_id = "/base_laser_link";
-    output.header.stamp = ros::Time::now();
+    output.header.stamp = ros::Time();
     output.point.x = dist * cos(angle);
     output.point.y = dist * sin(angle);
     output.point.z = 0.0;

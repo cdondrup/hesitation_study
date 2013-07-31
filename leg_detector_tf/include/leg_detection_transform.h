@@ -24,6 +24,8 @@
 // Auto-generated from cfg/ directory.
 // #include <node_example/node_example_paramsConfig.h>
 
+#define MAX_LEG_DISTANCE 5
+
 using std::string;
 
 class LegDetectorTf
