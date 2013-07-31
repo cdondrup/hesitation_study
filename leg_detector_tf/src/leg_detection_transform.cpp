@@ -74,7 +74,7 @@ geometry_msgs::PointStamped LegDetectorTf::polarToCartesian(float dist, float an
     output.header.stamp = ros::Time();
     output.point.x = dist * cos(angle);
     output.point.y = dist * sin(angle);
-    output.point.z = 0.365;
+    output.point.z = 0.0;
     ROS_DEBUG("LegDetectorTf::polarToCartesian: Cartesian point: x: %f, y: %f, z %f", output.point.x, output.point.y, output.point.z);
     return output;
 }
