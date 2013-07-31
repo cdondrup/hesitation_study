@@ -40,7 +40,7 @@ void LegDetectorTf::createVisualisation(std::vector<geometry_msgs::PointStamped>
     visualization_msgs::MarkerArray marker_array;
     for(int i = 0; i < leg_points.size(); i++) {
         visualization_msgs::Marker marker;
-        marker.header.frame_id = "leg_detector_tf";
+        marker.header.frame_id = "/map";
         marker.header.stamp = ros::Time::now();
         marker.ns = "leg_detector_tf";
         marker.id = i;
@@ -53,9 +53,9 @@ void LegDetectorTf::createVisualisation(std::vector<geometry_msgs::PointStamped>
         marker.pose.orientation.y = 0.0;
         marker.pose.orientation.z = 0.0;
         marker.pose.orientation.w = 1.0;
-        marker.scale.x = 1;
+        marker.scale.x = 0.1;
         marker.scale.y = 0.1;
-        marker.scale.z = 0.1;
+        marker.scale.z = 0.3;
         marker.color.a = 1.0;
         marker.color.r = 0.0;
         marker.color.g = 1.0;
