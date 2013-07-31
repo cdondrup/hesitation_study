@@ -5,11 +5,12 @@
  * Constructor.
  *------------------------------------------------------------------*/
 
-LegDetectorTf::LegDetectorTf(ros::Publisher *pub)
+LegDetectorTf::LegDetectorTf(ros::Publisher *pub_msg, ros::Publisher *pub_vis) :
+    pub_msg(pub_msg),
+    pub_vis(pub_vis)
 {
 	distance.header.seq = 0;
 	distance.header.frame_id = "leg_detector_tf";
-	this->pub = pub;
 } // end NodeExample()
 
 /*--------------------------------------------------------------------
@@ -26,10 +27,42 @@ LegDetectorTf::~LegDetectorTf()
  * Publish the message.
  *------------------------------------------------------------------*/
 
-void LegDetectorTf::publishMessage()
+void LegDetectorTf::publishMessage(leg_detector_tf_msgs::Distance distance)
 {
-  pub->publish(distance);
+  pub_msg->publish(distance);
 } // end publishMessage()
+
+void LegDetectorTf::publishVisualisation(visualization_msgs::MarkerArray marker_array) {
+    pub_vis->publish(marker_array);
+}
+
+void createVisualisation(std::vector<geometry_msgs::PointStamped> leg_points) {
+    visualization_msgs::MarkerArray marker_array;
+    for(int i = 0; i < leg_points.size(); i++) {
+        visualization_msgs::Marker marker;
+        marker.header.frame_id = "leg_detector_tf";
+        marker.header.stamp = ros::Time::now();
+        marker.ns = "leg_detector_tf";
+        marker.id = i;
+        marker.type = visualization_msgs::Marker::CYLINDER;
+        marker.action = visualization_msgs::Marker::ADD;
+        marker.pose.position.x = leg_points[i].point.x;
+        marker.pose.position.y = leg_points[i].point.y;
+        marker.pose.position.z = leg_points[i].point.z;
+        marker.pose.orientation.x = 0.0;
+        marker.pose.orientation.y = 0.0;
+        marker.pose.orientation.z = 0.0;
+        marker.pose.orientation.w = 1.0;
+        marker.scale.x = 1;
+        marker.scale.y = 0.1;
+        marker.scale.z = 0.1;
+        marker.color.a = 1.0;
+        marker.color.r = 0.0;
+        marker.color.g = 1.0;
+        marker.color.b = 0.0;
+        marker_array.markers.push_back(marker);
+    }
+}
 
 /*--------------------------------------------------------------------
  * messageCallback()
@@ -38,6 +71,7 @@ void LegDetectorTf::publishMessage()
 
 void LegDetectorTf::messageCallback(const sensor_msgs::LaserScan::ConstPtr &msg)
 {
+    std::vector<geometry_msgs::PointStamped> leg_points;
 	++distance.header.seq;
 	distance.max = 0.0;
 	distance.min = 1000.0;
@@ -53,7 +87,7 @@ void LegDetectorTf::messageCallback(const sensor_msgs::LaserScan::ConstPtr &msg)
 		        angle);
 		    geometry_msgs::PointStamped coords = polarToCartesian(msg->ranges[i], angle);
 		    transformLaser(coords, "/base_link");
-		    transformLaser(coords, "/map");
+		    leg_points.push_back(transformLaser(coords, "/map"));
 			legs.push_back(msg->ranges[i]);
 			ROS_DEBUG("LegDetectorTf::messageCallback: Range: %f", msg->ranges[i]);
 			distance.max = msg->ranges[i] > distance.max ? msg->ranges[i] : distance.max;
@@ -64,7 +98,7 @@ void LegDetectorTf::messageCallback(const sensor_msgs::LaserScan::ConstPtr &msg)
 	distance.avg /= legs.size();
 	ROS_DEBUG("LegDetectorTf::messageCallback: Range: Min: %f, Max: %f, Avg: %f", distance.min, distance.max, distance.avg);
 	distance.header.stamp = ros::Time::now();
-	publishMessage();
+	publishMessage(distance);
 } // end publishCallback()
 
 geometry_msgs::PointStamped LegDetectorTf::polarToCartesian(float dist, float angle) {

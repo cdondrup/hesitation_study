@@ -5,6 +5,8 @@
 #include <ros/ros.h>
 #include <ros/time.h>
 #include <sensor_msgs/LaserScan.h>
+#include <visualization_msgs/Marker.h>
+#include <visualization_msgs/MarkerArray.h>
 #include <geometry_msgs/PointStamped.h>
 #include <tf/transform_listener.h>
 
@@ -27,25 +29,28 @@ using std::string;
 class LegDetectorTf
 {
 private:
-	leg_detector_tf_msgs::Distance distance;
-	ros::Publisher *pub;
-	tf::TransformListener listener;
-	
-	geometry_msgs::PointStamped polarToCartesian(float dist, float angle);
-	geometry_msgs::PointStamped transformLaser(geometry_msgs::PointStamped, std::string);
+    ros::Publisher *pub_msg, *pub_vis;
+    tf::TransformListener listener;
+    leg_detector_tf_msgs::Distance distance;
+
+    geometry_msgs::PointStamped polarToCartesian(float dist, float angle);
+    geometry_msgs::PointStamped transformLaser(geometry_msgs::PointStamped, std::string);
+    
+    void createVisualisation(std::vector<geometry_msgs::PointStamped>);
+
+    //! Publish the message.
+    void publishMessage(leg_detector_tf_msgs::Distance distance);
+    void publishVisualisation(visualization_msgs::MarkerArray marker_array);
 	
 public:
   //! Constructor.
-  LegDetectorTf(ros::Publisher *pub);
+  LegDetectorTf(ros::Publisher *pub_msg, ros::Publisher *pub_vis);
 
   //! Destructor.
   ~LegDetectorTf();
 
   //! Callback function for dynamic reconfigure server.
   //void configCallback(leg_detector_transform::leg_detector_transform_paramsConfig &config, uint32_t level);
-
-  //! Publish the message.
-  void publishMessage();
 
   //! Callback function for subscriber.
   void messageCallback(const sensor_msgs::LaserScan::ConstPtr &msg);
