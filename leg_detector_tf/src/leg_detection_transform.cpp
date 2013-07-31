@@ -50,7 +50,9 @@ void LegDetectorTf::publishDetections(std::vector<geometry_msgs::PointStamped> c
         pose.orientation.y = 0.0;
         pose.orientation.z = 0.0;
         pose.orientation.w = 1.0;
+        result.poses.push_back(pose);
     }
+    pub_detect->publish(result);
 }
 
 void LegDetectorTf::createVisualisation(std::vector<geometry_msgs::PointStamped> points) {
