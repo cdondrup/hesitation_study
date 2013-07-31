@@ -8,6 +8,8 @@
 #include <visualization_msgs/Marker.h>
 #include <visualization_msgs/MarkerArray.h>
 #include <geometry_msgs/PointStamped.h>
+#include <geometry_msgs/Pose.h>
+#include <geometry_msgs/PoseArray.h>
 #include <tf/transform_listener.h>
 
 #include <string.h>
@@ -31,9 +33,9 @@ using std::string;
 class LegDetectorTf
 {
 private:
-    ros::Publisher *pub_msg, *pub_vis;
+    ros::Publisher *pub_msg, *pub_vis, *pub_detect;
     tf::TransformListener listener;
-    leg_detector_tf_msgs::Distance distance;
+    long unsigned int dist_seq, marker_seq, detect_seq;
 
     geometry_msgs::PointStamped polarToCartesian(float dist, float angle);
     geometry_msgs::PointStamped transformLaser(geometry_msgs::PointStamped, std::string);
@@ -43,11 +45,12 @@ private:
     //! Publish the message.
     void publishMessage(leg_detector_tf_msgs::Distance distance);
     void publishVisualisation(visualization_msgs::MarkerArray marker_array);
+    void publishDetections(std::vector<geometry_msgs::PointStamped> centers);
     std::vector<geometry_msgs::PointStamped> getCenterPoints(std::vector<std::vector<geometry_msgs::PointStamped> >);
 	
 public:
   //! Constructor.
-  LegDetectorTf(ros::Publisher *pub_msg, ros::Publisher *pub_vis);
+  LegDetectorTf(ros::Publisher *pub_msg, ros::Publisher *pub_vis, ros::Publisher *pub_detect);
 
   //! Destructor.
   ~LegDetectorTf();
