@@ -36,7 +36,7 @@ void LegDetectorTf::publishVisualisation(visualization_msgs::MarkerArray marker_
     pub_vis->publish(marker_array);
 }
 
-void createVisualisation(std::vector<geometry_msgs::PointStamped> leg_points) {
+void LegDetectorTf::createVisualisation(std::vector<geometry_msgs::PointStamped> leg_points) {
     visualization_msgs::MarkerArray marker_array;
     for(int i = 0; i < leg_points.size(); i++) {
         visualization_msgs::Marker marker;
@@ -62,6 +62,7 @@ void createVisualisation(std::vector<geometry_msgs::PointStamped> leg_points) {
         marker.color.b = 0.0;
         marker_array.markers.push_back(marker);
     }
+    publishVisualisation(marker_array);
 }
 
 /*--------------------------------------------------------------------
@@ -99,6 +100,7 @@ void LegDetectorTf::messageCallback(const sensor_msgs::LaserScan::ConstPtr &msg)
 	ROS_DEBUG("LegDetectorTf::messageCallback: Range: Min: %f, Max: %f, Avg: %f", distance.min, distance.max, distance.avg);
 	distance.header.stamp = ros::Time::now();
 	publishMessage(distance);
+	createVisualisation(leg_points);
 } // end publishCallback()
 
 geometry_msgs::PointStamped LegDetectorTf::polarToCartesian(float dist, float angle) {
