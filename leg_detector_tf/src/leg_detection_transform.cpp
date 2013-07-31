@@ -80,6 +80,7 @@ geometry_msgs::PointStamped LegDetectorTf::polarToCartesian(float dist, float an
 }
 
 geometry_msgs::PointStamped LegDetectorTf::transformLaser(geometry_msgs::PointStamped input, std::string target) {
+    ROS_DEBUG("LegDetectorTf::transformLaser: Transforming %s to %s", input.header.frame_id.c_str(), target.c_str());
     geometry_msgs::PointStamped output;
     try {
         listener.transformPoint(target, input, output);
