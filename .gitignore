@@ -12,5 +12,11 @@
 *.la
 *.a
 
+#Python
+*.pyc
+
+# Temp and swap files
 *~
 rosbuild*
+*.swp
+*.swo
