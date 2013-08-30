@@ -3,6 +3,8 @@
 import rospy
 import smach
 
+import actionlib
+from actionlib_msgs.msg import *
 from move_base_msgs.msg import *
 
 # define state MoveRobot
@@ -11,6 +13,13 @@ class MoveRobot(smach.State):
         smach.State.__init__(self,
                 outcomes = ['reached_kitchen', 'reached_table', 'failure'],
                 input_keys = ['goal_pose'])
+	rospy.loginfo("Creating base movement client.")
+        self.baseClient = actionlib.SimpleActionClient(
+            'move_base',
+            MoveBaseAction
+        )
+        self.baseClient.wait_for_server()
+        rospy.loginfo("Base client initialized")
 
     def execute(self, userdata):
         #TODO: Have a failure state
@@ -24,7 +33,7 @@ class MoveRobot(smach.State):
         if self.baseClient.get_state() != GoalStatus.SUCCEEDED:
             return 'failure'
 
-        time.sleep(0.3) #avoid jumping out of a state immediately after entering it - actionlib bug
+        rospy.sleep(rospy.Duration.from_sec(0.3)) #avoid jumping out of a state immediately after entering it - actionlib bug
 
         if userdata.goal_pose[0] == 'kitchen':
             return 'reached_kitchen'
