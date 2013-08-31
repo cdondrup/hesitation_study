@@ -30,14 +30,14 @@ class ChooseBehaviour(smach.State):
             self.gazingClient.send_goal(gaze)
             goal.time_to_reset = 5.0
             goal.max_vel_x     = 0.55
-            goal.max_rot_vel   = 0.4
+            goal.max_rot_vel   = 1.0
             goal.max_dist      = 6.0
             goal.min_dist      = 1.5
         else:
             self.gazingClient.cancel_all_goals()
             goal.time_to_reset = 2.0
             goal.max_vel_x     = 0.75
-            goal.max_rot_vel   = 0.5
+            goal.max_rot_vel   = 1.0
             goal.max_dist      = 1.0
             goal.min_dist      = 0.2
         self.behaviourClient.send_goal(goal)
