@@ -5,6 +5,7 @@ import smach
 import actionlib
 from random import randint
 from strands_human_aware_velocity.msg import *
+from strands_gazing.msg import *
 
 # define state ChooseBehaviour
 class ChooseBehaviour(smach.State):
@@ -14,18 +15,26 @@ class ChooseBehaviour(smach.State):
         self.behaviourClient = actionlib.SimpleActionClient('human_aware_planner_velocities', HumanAwareVelocityAction)
         self.behaviourClient.wait_for_server()
         rospy.loginfo(" ...done")
+        rospy.loginfo("Creating gazing client")
+        self.gazingClient = actionlib.SimpleActionClient('gaze_at_pose', GazeAtPoseAction)
+        self.gazingClient.wait_for_server()
+        rospy.loginfo(" ...done")
 
     def execute(self, usardata):
         goal = HumanAwareVelocityGoal
         toggle = randint(0,1)
         goal.seconds = 300.0
         if toggle == 0:
+            gaze = GazeAtPoseGoal
+            gaze.runtime_sec   = 300.0
+            self.gazingClient.send_goal(gaze)
             goal.time_to_reset = 5.0
             goal.max_vel_x     = 0.55
             goal.max_rot_vel   = 0.4
             goal.max_dist      = 6.0
             goal.min_dist      = 1.5
         else:
+            self.gazingClient.cancel_all_goals()
             goal.time_to_reset = 2.0
             goal.max_vel_x     = 0.75
             goal.max_rot_vel   = 0.5
@@ -39,4 +48,4 @@ class ChooseBehaviour(smach.State):
         """Overload the preempt request method."""
         State.request_preempt(self)
         rospy.logwarn("Preempted!")
-        self.behaviourClient.cancelAllGoals()
+        self.behaviourClient.cancel_all_goals()
