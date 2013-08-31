@@ -12,6 +12,7 @@ class MoveRobot(smach.State):
     def __init__(self):
         smach.State.__init__(self,
                 outcomes = ['reached_kitchen', 'reached_table', 'failure'],
+                output_keys = ['goal_pose'],
                 input_keys = ['goal_pose'])
 	rospy.loginfo("Creating base movement client.")
         self.baseClient = actionlib.SimpleActionClient(

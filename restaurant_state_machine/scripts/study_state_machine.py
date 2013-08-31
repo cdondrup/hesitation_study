@@ -29,7 +29,8 @@ def main():
             transitions={'goto_point':'MOVE_ROBOT'},
             remapping={'goal_pose':'goal_pose'})
         smach.StateMachine.add('MOVE_ROBOT', MoveRobot(),
-            transitions={'reached_table':'TAKE_ORDER', 'reached_kitchen':'CHOOSE_BEHAVIOUR' ,'failure':'aborted'})
+            transitions={'reached_table':'TAKE_ORDER', 'reached_kitchen':'CHOOSE_BEHAVIOUR' ,'failure':'MOVE_ROBOT'},
+            remapping={'goal_pose':'goal_pose'})
         smach.StateMachine.add('TAKE_ORDER', TakeOrder(),
             transitions={'ordered':'POINT_READER'})
         smach.StateMachine.add('CHOOSE_BEHAVIOUR', ChooseBehaviour(),
