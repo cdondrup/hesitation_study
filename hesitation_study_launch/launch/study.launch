@@ -1,7 +1,7 @@
 <launch>
     <!-- Global paramters -->
-    <arg name="map" default="/localhome/gestom/map/robolab.yaml" />
-    <arg name="waypoints" default="/localhome/strands/cdondrup/study-wp.csv" />
+    <arg name="map" default="/localhome/strands/cdondrup/study_croped.yaml" />
+    <arg name="waypoints" default="/localhome/strands/cdondrup/study.csv" />
 
     <!-- Navigation -->
     <include file="$(find scitos_2d_navigation)/launch/scitos_2d_nav.launch">
@@ -24,5 +24,13 @@
         <param name="waypoints" value="$(arg waypoints)" type="string"/>
     </node>
 
+    <!-- Recording -->
+    <node pkg="rosbag" type="record" name="pose_recording" args="-o /localhome/strands/cdondrup/pre-study/pose /amcl_pose /robot_pose" if="$(arg record)"/>
+    <node pkg="rosbag" type="record" name="gaze_recording" args="-o /localhome/strands/cdondrup/pre-study/gaze -e '/gaze_at_pose/(.*)'" if="$(arg record)"/>
+    <node pkg="rosbag" type="record" name="ppldet_recording" args="-o /localhome/strands/cdondrup/pre-study/ppldet /ground_plane /visual_odometry/motion_matrix - '/upper_body_detector/(.*)' -e '/pedestrian_(.*)' -x '(.*)image'" if="$(arg record)"/>
+    <node pkg="rosbag" type="record" name="vel_recording" args="-o /localhome/strands/cdondrup/pre-study/vel -e '/human_aware_planner_velocities/(.*)'" if="$(arg record)"/>
+    <node pkg="rosbag" type="record" name="state_recording" args="-o /localhome/strands/cdondrup/pre-study/state -e '/hesitation_study_state_machine/(.*)'" if="$(arg record)"/>
+    <node pkg="rosbag" type="record" name="rosout_recording" args="-o /localhome/strands/cdondrup/pre-study/rosout /rosout" if="$(arg record)"/>
+    <node pkg="rosbag" type="record" name="behaviour_recording" args="-o /localhome/strands/cdondrup/pre-study/behaviour /study/behaviour" if="$(arg record)"/>
 
 </launch> 
